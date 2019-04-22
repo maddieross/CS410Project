@@ -12,12 +12,17 @@ public class ProjectDao {
 	    {
 		String strRemotHost = "localhost";
 		int DBPort = 5980;
-		String dbUser = "msandbox";
-		String dbPassword = "Testpoop1";
+		Properties props = new Properties();
+		props.setProperty("user", "msandbox");
+		props.setProperty("password", "Testpoop1");
+		props.setProperty("useSSL", "false");	
+		//String dbUser = "msandbox";
+		//String dbPassword = "Testpoop1";
 
 		Class.forName("com.mysql.jdbc.Driver");
-		con = DriverManager.getConnection("jdbc:mysql://localhost:"+DBPort, dbUser, dbPassword);
+		//con = DriverManager.getConnection("jdbc:mysql://localhost:"+DBPort, dbUser, dbPassword);
 
+		con = DriverManager.getConnection("jdbc:mysql://localhost:"+DBPort, props);
 		con.setAutoCommit(false);
 
 		stmt = con.createStatement();
