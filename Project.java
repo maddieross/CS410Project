@@ -6,6 +6,8 @@ public class Project {
 	
 	public static void main(String[] args) {
 		if(args.length > 0) {
+			ProjectDao dao = new ProjectDao();
+			System.out.println("Dao started");
 			String function = args[0];
 			switch(function) {
 			case "cars":
