@@ -4,10 +4,25 @@ import java.util.*;
 
 
 public class ProjectDao {
+	private static ArrayList<Statement> statements = new ArrayList<Statement>();
+	private static Connection con;
+	private static boolean made;
 
 	public ProjectDao() {
-		Connection con = null;
-		Statement stmt = null, stmt2 = null;
+		getConnection();
+	}
+
+	/*
+	 *   Only call startUp if it's the first time the DAO is being called.
+	 *   Otherwise, just return existing connection
+	 */
+	public void getConnection() {
+		if(!made) {
+			startUp();
+		}
+	}
+
+	public void startUp() {
 	    try
 	    {
 		String strRemotHost = "localhost";
@@ -15,17 +30,15 @@ public class ProjectDao {
 		Properties props = new Properties();
 		props.setProperty("user", "msandbox");
 		props.setProperty("password", "Testpoop1");
-		props.setProperty("useSSL", "false");	
-		//String dbUser = "msandbox";
-		//String dbPassword = "Testpoop1";
+		props.setProperty("useSSL", "false");
 
 		Class.forName("com.mysql.jdbc.Driver");
-		//con = DriverManager.getConnection("jdbc:mysql://localhost:"+DBPort, dbUser, dbPassword);
 
 		con = DriverManager.getConnection("jdbc:mysql://localhost:"+DBPort, props);
 		con.setAutoCommit(false);
 
-		stmt = con.createStatement();
+		made = true;
+		/*stmt = con.createStatement();
 		stmt.execute("use rental");
 		ResultSet resultSet = stmt.executeQuery("select * from client");
 
@@ -39,7 +52,7 @@ public class ProjectDao {
 					System.out.print(columnValue + " " + rsmd.getColumnName(i));
 				}
 				System.out.println(" ");
-			}
+			}*/
 	    } catch (SQLException e) {
 	    	System.out.println(e.getMessage());
 	    	try {
@@ -50,27 +63,59 @@ public class ProjectDao {
 	    } catch (Exception e) {
 	    	System.out.println(e.getMessage());
 	    }
-	    finally {
-	    	try {
-	    		if(stmt != null) { stmt.close();}
-
-	    		if(stmt2 !=null) { stmt2.close();}
-	    	} catch (SQLException innerE) {
-	    		System.out.println(innerE.getMessage());
-	    	}
-
-	    	try {
-	    		con.setAutoCommit(true);
-	    		con.close();
-	    	} catch (SQLException conE) {
-	    		System.out.println(conE.getMessage());
-	    	}
-	    }
 	}
-	
+
+	public static void shutDown() {
+		// Statements and PreparedStatements
+		int i = 0;
+		while (!statements.isEmpty()) {
+			// PreparedStatement extend Statement
+			Statement st = (Statement) statements.remove(i);
+			try {
+				if (st != null) {
+					st.close();
+					st = null;
+				}
+			} catch (SQLException sqle) {
+				printSQLException(sqle);
+			}
+		}
+
+		//Connection
+		try {
+			con.setAutoCommit(true);
+			con.close();
+		} catch (SQLException conE) {
+			System.out.println(conE.getMessage());
+		}
+	}
+
 	public static void main (String[] args) {
 		ProjectDao dao = new ProjectDao();
 		System.out.println("Dao started");
+		dao.shutDown();
+	}
+
+	/**
+	 * Prints details of an SQLException chain to <code>System.err</code>.
+	 * Details included are SQL State, Error code, Exception message.
+	 *
+	 * @param e the SQLException from which to print details.
+	 */
+	public static void printSQLException(SQLException e)
+	{
+		// Unwraps the entire exception chain to unveil the real cause of the
+		// Exception.
+		while (e != null)
+		{
+			System.err.println("\n----- SQLException -----");
+			System.err.println("  SQL State:  " + e.getSQLState());
+			System.err.println("  Error Code: " + e.getErrorCode());
+			System.err.println("  Message:    " + e.getMessage());
+			// for stack traces, refer to derby.log or uncomment this:
+			//e.printStackTrace(System.err);
+			e = e.getNextException();
+		}
 	}
 
 }	
