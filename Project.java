@@ -127,13 +127,13 @@ public class Project {
 	private static void help() {
 		System.out.println("usage: java Program [commands] [args....] ");
 		System.out.println("commands:");
-		System.out.println("cars                                                             – list all cars, description, and status");
-		System.out.println("availableCars                                                    – list all the available cars and car description");
-		System.out.println("addNewCar [model] [plate#] [miles]                               – add a new car to the database");
-		System.out.println("addClient [name] [code] [licenseNumber] [phone]                  – add a new client to the system");
-		System.out.println("rentCar [client car] [startDate] [endDate] [miles] [feeType]     – add a new client to the system");
-		System.out.println("rentalDetails [rentalID]                                         – Show details of rental");
-		System.out.println("deleteRental [rentalID]                                          – delete/cancel previously added rental");
+		System.out.println("cars                                                             - list all cars, description, and status");
+		System.out.println("availableCars                                                    - list all the available cars and car description");
+		System.out.println("addNewCar [model] [plate#] [miles]                               - add a new car to the database");
+		System.out.println("addClient [name] [code] [licenseNumber] [phone]                  - add a new client to the system");
+		System.out.println("rentCar [client car] [startDate] [endDate] [miles] [feeType]     - add a new client to the system");
+		System.out.println("rentalDetails [rentalID]                                         - Show details of rental");
+		System.out.println("deleteRental [rentalID]                                          - delete/cancel previously added rental");
 	}
 
 }
