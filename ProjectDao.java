@@ -35,24 +35,14 @@ public class ProjectDao {
 		Class.forName("com.mysql.jdbc.Driver");
 
 		con = DriverManager.getConnection("jdbc:mysql://localhost:"+DBPort, props);
+		Statement stmt = con.createStatement();
+		stmt.execute("use rental");
+
+		stmt.close();
 		con.setAutoCommit(false);
 
 		made = true;
-		/*stmt = con.createStatement();
-		stmt.execute("use rental");
-		ResultSet resultSet = stmt.executeQuery("select * from client");
 
-		ResultSetMetaData rsmd = resultSet.getMetaData();
-
-		int columnsNumber = rsmd.getColumnCount();
-			while (resultSet.next()) {
-				for (int i = 1; i <= columnsNumber; i++) {
-					if (i > 1) System.out.print(",  ");
-					String columnValue = resultSet.getString(i);
-					System.out.print(columnValue + " " + rsmd.getColumnName(i));
-				}
-				System.out.println(" ");
-			}*/
 	    } catch (SQLException e) {
 	    	System.out.println(e.getMessage());
 	    	try {
@@ -64,6 +54,38 @@ public class ProjectDao {
 	    	System.out.println(e.getMessage());
 	    }
 	}
+
+	public void getAvailableCars() throws SQLException {
+	    PreparedStatement getAvCars = null;
+
+	    try {
+	        con.setAutoCommit(false);
+            getAvCars = con.prepareStatement("SELECT * FROM CAR WHERE status='Available'");
+
+            ResultSet resultSet = getAvCars.executeQuery("select * from client");
+
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+
+            int columnsNumber = rsmd.getColumnCount();
+            while (resultSet.next()) {
+                for (int i = 1; i <= columnsNumber; i++) {
+                    if (i > 1) System.out.print(",  ");
+                    String columnValue = resultSet.getString(i);
+                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                }
+                System.out.println(" ");
+            }
+            resultSet.close();
+        } catch (SQLException e) {
+	        con.rollback();
+        } finally {
+	        if(getAvCars != null) {
+                getAvCars.close();
+            }
+
+
+        }
+    }
 
 	public static void shutDown() {
 		// Statements and PreparedStatements
@@ -94,6 +116,7 @@ public class ProjectDao {
 		ProjectDao dao = new ProjectDao();
 		System.out.println("Dao started");
 		dao.shutDown();
+        System.out.println("Dao shut down correctly");
 	}
 
 	/**
