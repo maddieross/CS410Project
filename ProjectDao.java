@@ -60,21 +60,30 @@ public class ProjectDao {
 
 	    try {
 	        con.setAutoCommit(false);
-            getAvCars = con.prepareStatement("SELECT * FROM CAR WHERE status='Available'");
+            getAvCars = con.prepareStatement("SELECT * FROM car WHERE status='Available'");
 
-            ResultSet resultSet = getAvCars.executeQuery("select * from client");
+            ResultSet resultSet = getAvCars.executeQuery();
 
             ResultSetMetaData rsmd = resultSet.getMetaData();
 
             int columnsNumber = rsmd.getColumnCount();
-            while (resultSet.next()) {
+	    
                 for (int i = 1; i <= columnsNumber; i++) {
-                    if (i > 1) System.out.print(",  ");
-                    String columnValue = resultSet.getString(i);
-                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                    System.out.print("|" + rsmd.getColumnName(i) + "|");
                 }
-                System.out.println(" ");
+
+		System.out.println("");
+            while (resultSet.next()) {
+
+                for (int i = 1; i <= columnsNumber; i++) {
+                    String columnValue = resultSet.getString(i);
+                    System.out.print("| " + columnValue + " |");
+                }
+		System.out.println(" ");
+		System.out.println("-------------------------------------");
+
             }
+
             resultSet.close();
         } catch (SQLException e) {
 	        con.rollback();
@@ -116,11 +125,7 @@ public class ProjectDao {
 		ProjectDao dao = new ProjectDao();
 		System.out.println("Dao started");
 		dao.shutDown();
-<<<<<<< HEAD
-        System.out.println("Dao shut down correctly");
-=======
-		System.out.println("Dao shut down correctly");
->>>>>>> Temp changes on onyx. Need to pull from local machine
+        	System.out.println("Dao shut down correctly");
 	}
 
 	/**

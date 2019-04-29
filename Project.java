@@ -1,12 +1,15 @@
+import java.sql.*;
+
 /**
  * @author mross
  *
  */
 public class Project {
+	private static ProjectDao dao;
 	
 	public static void main(String[] args) {
 		if(args.length > 0) {
-			ProjectDao dao = new ProjectDao();
+			dao = new ProjectDao();
 			System.out.println("Dao started");
 			String function = args[0];
 			switch(function) {
@@ -82,7 +85,7 @@ public class Project {
 		}else{
 			help();	
 		}
-		help();	
+		//help();	
 	}
 
 	
@@ -92,9 +95,12 @@ public class Project {
 	}
 	
 	private static void availableCars() {
-		// TODO Auto-generated method stub
-		 
-		
+	    try {
+		System.out.println("Getting all available cars");
+		dao.getAvailableCars(); 
+	    } catch (SQLException e) {
+		dao.printSQLException(e);
+	    } finally { dao.shutDown();}
 	}
 	
 	private static void addNewCar(String model, String plateNum, int miles) {
