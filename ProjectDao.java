@@ -116,7 +116,11 @@ public class ProjectDao {
 		ProjectDao dao = new ProjectDao();
 		System.out.println("Dao started");
 		dao.shutDown();
+<<<<<<< HEAD
         System.out.println("Dao shut down correctly");
+=======
+		System.out.println("Dao shut down correctly");
+>>>>>>> Temp changes on onyx. Need to pull from local machine
 	}
 
 	/**
@@ -135,8 +139,6 @@ public class ProjectDao {
 			System.err.println("  SQL State:  " + e.getSQLState());
 			System.err.println("  Error Code: " + e.getErrorCode());
 			System.err.println("  Message:    " + e.getMessage());
-			// for stack traces, refer to derby.log or uncomment this:
-			//e.printStackTrace(System.err);
 			e = e.getNextException();
 		}
 	}
