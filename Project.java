@@ -120,8 +120,13 @@ public class Project {
 
 
 	private static void rentalDetails(int rentalID) {
-		// TODO Auto-generated method stub
 		
+	    try {
+		System.out.println("Getting rental details for: " + rentalID);
+		dao.getRentalDetails(rentalID); 
+	    } catch (SQLException e) {
+		dao.printSQLException(e);
+	    } finally { dao.shutDown();}
 	}
 	
 	private static void deleteRental(int rentalID) {

@@ -101,10 +101,9 @@ public class ProjectDao {
 
 		try {
 			con.setAutoCommit(false);
-			getRentDet = con.prepareStatement("select * from rent " +
-					"join client on rent.code = client.code" +
-					"join car on rent.plate = car.plate_number" +
-					"where rental_id = ?");
+			getRentDet = con.prepareStatement("select rent.plate, rent.start, rent.end, rent.num_miles, rent.fee_type, client.name, client.dl, client.phone" +
+				", car.*, datediff(rent.end, rent.start) * car.fee as total from rent " + 
+				"join client on rent.code = client.code join car on rent.plate = car.plate_number where rental_id = ?");
 			getRentDet.setInt(1, rentalID);
 
 			ResultSet resultSet = getRentDet.executeQuery();
@@ -120,6 +119,7 @@ public class ProjectDao {
 			System.out.println("");
 			while (resultSet.next()) {
 
+				
 				for (int i = 1; i <= columnsNumber; i++) {
 					String columnValue = resultSet.getString(i);
 					System.out.print("| " + columnValue + " |");
@@ -132,6 +132,7 @@ public class ProjectDao {
 			resultSet.close();
 		} catch (SQLException e) {
 			con.rollback();
+			printSQLException(e);
 		} finally {
 			if(getRentDet != null) {
 				getRentDet.close();
