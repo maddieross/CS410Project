@@ -96,6 +96,50 @@ public class ProjectDao {
         }
     }
 
+    public void getRentalDetails(int rentalID) throws SQLException{
+		PreparedStatement getRentDet = null;
+
+		try {
+			con.setAutoCommit(false);
+			getRentDet = con.prepareStatement("select * from rent " +
+					"join client on rent.code = client.code" +
+					"join car on rent.plate = car.plate_number" +
+					"where rental_id = ?");
+			getRentDet.setInt(1, rentalID);
+
+			ResultSet resultSet = getRentDet.executeQuery();
+
+			ResultSetMetaData rsmd = resultSet.getMetaData();
+
+			int columnsNumber = rsmd.getColumnCount();
+
+			for (int i = 1; i <= columnsNumber; i++) {
+				System.out.print("|" + rsmd.getColumnName(i) + "|");
+			}
+
+			System.out.println("");
+			while (resultSet.next()) {
+
+				for (int i = 1; i <= columnsNumber; i++) {
+					String columnValue = resultSet.getString(i);
+					System.out.print("| " + columnValue + " |");
+				}
+				System.out.println(" ");
+				System.out.println("-------------------------------------");
+
+			}
+
+			resultSet.close();
+		} catch (SQLException e) {
+			con.rollback();
+		} finally {
+			if(getRentDet != null) {
+				getRentDet.close();
+			}
+		}
+
+	}
+
 	public static void shutDown() {
 		// Statements and PreparedStatements
 		int i = 0;
