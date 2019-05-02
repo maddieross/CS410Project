@@ -56,7 +56,7 @@ public class Project {
 					rentCar(client, car, startDate, endDate, miles, feeType);
 				} catch (Exception e) {
 					System.err.println(
-							"usage: java Program rentCar [client car] [startDate] [endDate] [miles] [feeType]");
+							"usage: java Program rentCar [client code] [car plate number] [startDate: YYYY-MM-DD] [endDate: YYYY-MM-DD] [miles] [feeType]");
 					System.exit(0);
 
 				}
@@ -83,11 +83,12 @@ public class Project {
 			case "help":
 				help();
 				break;
+			default:
+				help(); 
 			}
 		} else {
 			help();
 		}
-		// help();
 	}
 
 	private static void cars() {
@@ -167,7 +168,22 @@ public class Project {
 	}
 
 	private static void rentCar(int client, String car, String startDate, String endDate, int miles, String feeType) {
-		// TODO Auto-generated method stub
+		//TODO check date is entered in correct format? 
+		
+		if(feeType.equals("Economy") || feeType.equals("Compact") || feeType.equals("Midsize") || feeType.equals("FullSize") || feeType.equals("Premium")|| feeType.equals("Luxury")) {
+			try {
+				System.out.println("Renting car to:");
+				dao.rentCar(client, car, startDate, endDate, miles, feeType);
+			} catch (SQLException e) {
+				dao.printSQLException(e);
+			} finally {
+				dao.shutDown();
+			} 
+		}else {
+			System.err.println("incorrect feeType. feeTypes: Economy, Compact, Midsize, Fullsize, Premium, or Luxury");
+			System.exit(0); 
+		}
+		
 	}
 
 	private static void rentalDetails(int rentalID) {

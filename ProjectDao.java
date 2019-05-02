@@ -76,7 +76,7 @@ public class ProjectDao {
 					System.out.print("| " + columnValue + " |");
 				}
 				System.out.println(" ");
-				System.out.println("-------------------------------------");
+				System.out.println("----------------------------------------------------------");
 			}
 			resultSet.close();
 		} catch (SQLException e) {
@@ -117,6 +117,127 @@ public class ProjectDao {
 			}
 			con.setAutoCommit(true);
 		}
+	}
+	public String getclientName(int client) throws SQLException{
+		PreparedStatement clientCheck = null;
+		String returnStmt = null;
+		try {
+			con.setAutoCommit(false);
+			clientCheck = con.prepareStatement("SELECT name FROM client WHERE code=?");
+			clientCheck.setInt(1, client); 
+			ResultSet resultSet = clientCheck.executeQuery();
+			while (resultSet.next()) {
+				returnStmt = resultSet.getString("name");
+			}	
+			if(returnStmt == null) {
+				System.err.println("client does not exist in database"); 
+				System.exit(0); 
+			
+			}
+			resultSet.close();
+		} catch (SQLException e) {
+			con.rollback();
+			printSQLException(e);
+		} finally {
+			if (clientCheck != null) {
+				clientCheck.close();
+			}
+		con.setAutoCommit(true);
+		}
+		return returnStmt;
+	}
+	public String getCarStatus(String car)throws SQLException{
+		PreparedStatement getCarStatus = null;
+		String returnStmt=null;
+		try {
+			con.setAutoCommit(false);
+			getCarStatus = con.prepareStatement("SELECT status FROM car WHERE plate_number=?");
+			getCarStatus.setString(1, car); 
+			ResultSet resultSet = getCarStatus.executeQuery();
+			while (resultSet.next()) {
+				returnStmt = resultSet.getString("status");
+			}	
+			if(returnStmt == null) {
+				System.err.println("car does not exist in database"); 
+				System.exit(0); 
+			}
+			resultSet.close();
+		} catch (SQLException e) {
+			con.rollback();
+			printSQLException(e);
+		} finally {
+			if (getCarStatus != null) {
+				getCarStatus.close();
+			}
+		con.setAutoCommit(true);
+		}
+		return returnStmt; 
+	}
+	public void updateCarStatus(String status, String car) throws SQLException{
+		if(!status.equals("Available")) {
+			if(!getCarStatus(car).equals("Available")) {
+				System.err.println("Car is not available");
+				System.exit(0);
+			}
+		}
+		PreparedStatement updateStatus = null;
+		try {
+			con.setAutoCommit(false);
+			updateStatus = con.prepareStatement("UPDATE car SET status=? WHERE plate_number=?");
+			updateStatus.setString(1, status);
+			updateStatus.setString(2, car);
+			int added = updateStatus.executeUpdate();
+			if (added > 0) {
+				System.out.println("car status updated to: "+ status);
+			} else {
+				System.out.println("car status not updated");
+			}
+		}catch(SQLException e) {
+			con.rollback();
+			printSQLException(e);
+		} finally {
+			if (updateStatus != null) {
+				updateStatus.close();
+			}
+			con.setAutoCommit(true);
+		}
+		
+	}
+	public void rentCar(int client, String car, String startDate, String endDate, int miles, String feeType) throws SQLException {
+		String clientName = getclientName(client); //check client exist 
+		System.out.println(clientName);
+		updateCarStatus("Rented", car); //check car is available and update status to Rented
+		PreparedStatement rentCar = null;
+		try {
+			con.setAutoCommit(false);
+			rentCar = con.prepareStatement("insert into rent values (?, ?, ?, ?, ?, ?, ?)");
+			rentCar.setInt(1, 0);
+			rentCar.setString(2, car);
+			rentCar.setInt(3, client);
+			rentCar.setString(4, startDate);
+			rentCar.setString(5, endDate);
+			rentCar.setInt(6, miles);
+			rentCar.setString(7, feeType);
+			
+
+			int added = rentCar.executeUpdate();
+			if (added > 0) {
+				System.out.println("car rented");
+			} else {
+				System.out.println("car not rented");
+			}
+
+		} catch (SQLException e) {
+			con.rollback();
+			printSQLException(e);
+		} finally {
+			if (rentCar != null) {
+				rentCar.close();
+			}
+			con.setAutoCommit(true);
+		}
+		
+		
 	}
 
 	public ArrayList<String> getAllModels() throws SQLException {
