@@ -34,13 +34,13 @@ public class Project {
 				break;
 			case "addClient":
 				try {
-					String name = args[1];
-					int code = Integer.parseInt(args[2]);
-					String licenseNumber = args[3];
-					int phoneNum = Integer.parseInt(args[4]);
+					String name = args[1] + " "+args[2];
+					int code = Integer.parseInt(args[3]);
+					String licenseNumber = args[4];
+					String phoneNum = args[5];
 					addClient(name, code, licenseNumber, phoneNum);
 				} catch (Exception e) {
-					System.err.println("usage: java Program addClient [name] [code] [licenseNumber] [phone]");
+					System.err.println("usage: java Program addClient [first and last name] [code] [licenseNumber] [phone]");
 					System.exit(0);
 
 				}
@@ -155,9 +155,15 @@ public class Project {
 
 	}
 
-	private static void addClient(String name, int code, String licenseNumber, int phoneNum) {
-		// TODO Auto-generated method stub
-
+	private static void addClient(String name, int code, String licenseNumber, String phoneNum) {
+		try {
+			System.out.println("Adding client: "+ name);
+			dao.addClient(name, licenseNumber, phoneNum);
+		} catch (SQLException e) {
+			dao.printSQLException(e);
+		} finally {
+			dao.shutDown();
+		}
 	}
 
 	private static void rentCar(int client, String car, String startDate, String endDate, int miles, String feeType) {

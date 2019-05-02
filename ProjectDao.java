@@ -76,7 +76,7 @@ public class ProjectDao {
 					System.out.print("| " + columnValue + " |");
 				}
 				System.out.println(" ");
-				System.out.println("----------------------------------------------------------");
+				System.out.println("-------------------------------------");
 			}
 			resultSet.close();
 		} catch (SQLException e) {
@@ -85,9 +85,38 @@ public class ProjectDao {
 			if (getCars != null) {
 				getCars.close();
 			}
-
+		con.setAutoCommit(true);
 		}
 
+	}
+	
+	public void addClient(String name, String licenseNumber, String phoneNum) throws SQLException{
+		PreparedStatement addClient = null;
+		try {
+			con.setAutoCommit(false);
+			addClient = con.prepareStatement("insert into client values (?, ?, ?, ?)");
+			addClient.setInt(1, 0);
+			addClient.setString(2, name);
+			addClient.setString(3, licenseNumber);
+			addClient.setString(4, phoneNum);
+			
+
+			int added = addClient.executeUpdate();
+			if (added > 0) {
+				System.out.println("Client added");
+			} else {
+				System.out.println("Clinet not added");
+			}
+
+		} catch (SQLException e) {
+			con.rollback();
+			printSQLException(e);
+		} finally {
+			if (addClient != null) {
+				addClient.close();
+			}
+			con.setAutoCommit(true);
+		}
 	}
 
 	public ArrayList<String> getAllModels() throws SQLException {
