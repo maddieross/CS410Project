@@ -55,6 +55,116 @@ public class ProjectDao {
 	    }
 	}
 
+	public ArrayList<String> getAllModels() throws SQLException {
+		PreparedStatement getAllModels = null;
+		ArrayList<String> modelOptions = new ArrayList<>();
+		try {
+			con.setAutoCommit(false);
+			getAllModels = con.prepareStatement("SELECT name from model");
+			ResultSet resultSet = getAllModels.executeQuery();
+			while (resultSet.next()) {
+				modelOptions.add(resultSet.getString("name"));
+			}
+
+			resultSet.close();
+		} catch (SQLException e) {
+			con.rollback();
+		} finally {
+			if(getAllModels != null) {
+				getAllModels.close();
+			}
+			con.setAutoCommit(true);
+		}
+
+		return modelOptions;
+	}
+
+	public int getModelNum(String name) throws SQLException {
+		PreparedStatement getModel = null;
+		int modelNum = 1;
+		ArrayList<String> modelOptions = new ArrayList<>();
+		try {
+			con.setAutoCommit(false);
+			getModel = con.prepareStatement("SELECT model_id from model where name = ?");
+			getModel.setString(1, name);
+			ResultSet resultSet = getModel.executeQuery();
+
+			while (resultSet.next()) {
+				modelNum = resultSet.getInt("model_id");
+			}
+
+			resultSet.close();
+		} catch (SQLException e) {
+			con.rollback();
+		} finally {
+			if(getModel != null) {
+				getModel.close();
+			}
+			con.setAutoCommit(true);
+		}
+
+		return modelNum;
+
+	}
+
+	public void addCar(String plate, int miles, int model, String type, int fee) throws  SQLException {
+		PreparedStatement addCar = null;
+		try {
+			con.setAutoCommit(false);
+			addCar = con.prepareStatement("INSERT INTO CAR VALUES (?, ?, ?, ?, ?, ?)");
+			addCar.setString(1, plate);
+			addCar.setInt(2, miles);
+			addCar.setString(3, "Available");
+			addCar.setInt(4, model);
+			addCar.setString(5, type);
+			addCar.setInt(6, fee);
+
+			int added = addCar.executeUpdate();
+			if(added > 0) {
+				System.out.println("Car added");
+			} else {
+				System.out.println("Car not added");
+			}
+
+
+		} catch (SQLException e) {
+			con.rollback();
+		} finally {
+			if(addCar != null) {
+				addCar.close();
+			}
+			con.setAutoCommit(true);
+		}
+	}
+
+	public void addModel(String name, String make, int engSize, String year) throws SQLException {
+		PreparedStatement addModel = null;
+		try {
+			con.setAutoCommit(false);
+			addModel = con.prepareStatement("insert into model values (?, ?, ?, ?, ?)");
+			addModel.setInt(1, 0);
+			addModel.setString(2, name);
+			addModel.setString(3, make);
+			addModel.setInt(4, engSize);
+			addModel.setString(5, year);
+
+			int added = addModel.executeUpdate();
+			if(added > 0) {
+				System.out.println("Model added");
+			} else {
+				System.out.println("Model not added");
+			}
+
+		} catch (SQLException e) {
+			con.rollback();
+		} finally {
+			if(addModel != null) {
+				addModel.close();
+			}
+			con.setAutoCommit(true);
+		}
+	}
+
 	public void getAvailableCars() throws SQLException {
 	    PreparedStatement getAvCars = null;
 
@@ -91,7 +201,7 @@ public class ProjectDao {
 	        if(getAvCars != null) {
                 getAvCars.close();
             }
-
+			con.setAutoCommit(true);
 
         }
     }
@@ -137,6 +247,7 @@ public class ProjectDao {
 			if(getRentDet != null) {
 				getRentDet.close();
 			}
+			con.setAutoCommit(true);
 		}
 
 	}

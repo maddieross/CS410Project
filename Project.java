@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * @author mross
@@ -104,7 +105,37 @@ public class Project {
 	}
 	
 	private static void addNewCar(String model, String plateNum, int miles) {
-		// TODO Auto-generated method stub
+		try {
+			System.out.println("Adding new car. Seeing if it's existing model");
+			ArrayList<String> models = dao.getAllModels();
+			boolean found = true;
+
+			for(String mdl: models) {
+				if(mdl.compareTo(model)!=0) {
+					found = false;
+				} else {
+					found = false;
+				}
+			}
+
+			String carType = "Midsize";
+			int fee = 75;
+			if(found) {
+				int modelNum = dao.getModelNum(model);
+				dao.addCar(plateNum, miles, modelNum, carType, fee);
+			} else {
+				String newModel = "Fusion";
+				String make = "Ford";
+				int engSize = 1;
+				String year = "2019";
+				dao.addModel(newModel, make, engSize, year);
+				int modelNum = dao.getModelNum(newModel);
+				dao.addCar(plateNum, miles, modelNum, carType, fee);
+			}
+
+		} catch (SQLException e) {
+			dao.printSQLException(e);
+		} finally { dao.shutDown();}
 		
 	}
 	
@@ -120,8 +151,7 @@ public class Project {
 
 
 	private static void rentalDetails(int rentalID) {
-		
-	    try {
+		try {
 		System.out.println("Getting rental details for: " + rentalID);
 		dao.getRentalDetails(rentalID); 
 	    } catch (SQLException e) {
