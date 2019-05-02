@@ -76,7 +76,7 @@ public class ProjectDao {
 					System.out.print("| " + columnValue + " |");
 				}
 				System.out.println(" ");
-				System.out.println("-------------------------------------");
+				System.out.println("----------------------------------------------------------");
 			}
 			resultSet.close();
 		} catch (SQLException e) {
