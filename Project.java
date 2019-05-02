@@ -111,17 +111,21 @@ public class Project {
 			boolean found = true;
 
 			for(String mdl: models) {
-				if(mdl.compareTo(model)!=0) {
-					found = false;
+				System.out.println(mdl + " " +  model);
+				if(mdl.equals(model)) {
+					found = true;
+					break;
 				} else {
 					found = false;
 				}
 			}
 
+			System.out.println(found);
 			String carType = "Midsize";
 			int fee = 75;
 			if(found) {
 				int modelNum = dao.getModelNum(model);
+				System.out.println("Model: " + modelNum);
 				dao.addCar(plateNum, miles, modelNum, carType, fee);
 			} else {
 				String newModel = "Fusion";
@@ -130,6 +134,7 @@ public class Project {
 				String year = "2019";
 				dao.addModel(newModel, make, engSize, year);
 				int modelNum = dao.getModelNum(newModel);
+				System.out.println("Model: " + modelNum);
 				dao.addCar(plateNum, miles, modelNum, carType, fee);
 			}
 

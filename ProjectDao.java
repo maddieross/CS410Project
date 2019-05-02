@@ -111,7 +111,7 @@ public class ProjectDao {
 		PreparedStatement addCar = null;
 		try {
 			con.setAutoCommit(false);
-			addCar = con.prepareStatement("INSERT INTO CAR VALUES (?, ?, ?, ?, ?, ?)");
+			addCar = con.prepareStatement("insert into car values (?, ?, ?, ?, ?, ?)");
 			addCar.setString(1, plate);
 			addCar.setInt(2, miles);
 			addCar.setString(3, "Available");
@@ -129,6 +129,7 @@ public class ProjectDao {
 
 		} catch (SQLException e) {
 			con.rollback();
+			printSQLException(e);
 		} finally {
 			if(addCar != null) {
 				addCar.close();
