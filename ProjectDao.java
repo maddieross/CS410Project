@@ -1,7 +1,7 @@
+
 import java.io.*;
 import java.sql.*;
 import java.util.*;
-
 
 public class ProjectDao {
 	private static ArrayList<Statement> statements = new ArrayList<Statement>();
@@ -13,46 +13,81 @@ public class ProjectDao {
 	}
 
 	/*
-	 *   Only call startUp if it's the first time the DAO is being called.
-	 *   Otherwise, just return existing connection
+	 * Only call startUp if it's the first time the DAO is being called. Otherwise,
+	 * just return existing connection
 	 */
 	public void getConnection() {
-		if(!made) {
+		if (!made) {
 			startUp();
 		}
 	}
 
 	public void startUp() {
-	    try
-	    {
-		String strRemotHost = "localhost";
-		int DBPort = 5980;
-		Properties props = new Properties();
-		props.setProperty("user", "msandbox");
-		props.setProperty("password", "Testpoop1");
-		props.setProperty("useSSL", "false");
+		try {
+			String strRemotHost = "localhost";
+			int DBPort = 5980;
+			Properties props = new Properties();
+			props.setProperty("user", "msandbox");
+			props.setProperty("password", "Testpoop1");
+			props.setProperty("useSSL", "false");
 
-		Class.forName("com.mysql.jdbc.Driver");
+			Class.forName("com.mysql.jdbc.Driver");
 
-		con = DriverManager.getConnection("jdbc:mysql://localhost:"+DBPort, props);
-		Statement stmt = con.createStatement();
-		stmt.execute("use rental");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:" + DBPort, props);
+			Statement stmt = con.createStatement();
+			stmt.execute("use rental");
 
-		stmt.close();
-		con.setAutoCommit(false);
+			stmt.close();
+			con.setAutoCommit(false);
 
-		made = true;
+			made = true;
 
-	    } catch (SQLException e) {
-	    	System.out.println(e.getMessage());
-	    	try {
-	    	con.rollback();
-	    	} catch (SQLException innerE) {
-	    		System.out.println(e.getMessage());
-	    	}
-	    } catch (Exception e) {
-	    	System.out.println(e.getMessage());
-	    }
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			try {
+				con.rollback();
+			} catch (SQLException innerE) {
+				System.out.println(e.getMessage());
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	public void getCars() throws SQLException {
+		PreparedStatement getCars = null;
+
+		try {
+			con.setAutoCommit(false);
+			getCars = con.prepareStatement("SELECT * FROM car");
+			ResultSet resultSet = getCars.executeQuery();
+			ResultSetMetaData rsmd = resultSet.getMetaData();
+			int columnNumber = rsmd.getColumnCount();
+
+			for (int i = 1; i <= columnNumber; i++) {
+				System.out.print("|" + rsmd.getColumnName(i) + "|");
+			}
+
+			System.out.println("");
+
+			while (resultSet.next()) {
+				for (int i = 1; i <= columnNumber; i++) {
+					String columnValue = resultSet.getString(i);
+					System.out.print("| " + columnValue + " |");
+				}
+				System.out.println(" ");
+				System.out.println("-------------------------------------");
+			}
+			resultSet.close();
+		} catch (SQLException e) {
+			con.rollback();
+		} finally {
+			if (getCars != null) {
+				getCars.close();
+			}
+
+		}
+
 	}
 
 	public ArrayList<String> getAllModels() throws SQLException {
@@ -70,7 +105,7 @@ public class ProjectDao {
 		} catch (SQLException e) {
 			con.rollback();
 		} finally {
-			if(getAllModels != null) {
+			if (getAllModels != null) {
 				getAllModels.close();
 			}
 			con.setAutoCommit(true);
@@ -97,7 +132,7 @@ public class ProjectDao {
 		} catch (SQLException e) {
 			con.rollback();
 		} finally {
-			if(getModel != null) {
+			if (getModel != null) {
 				getModel.close();
 			}
 			con.setAutoCommit(true);
@@ -107,7 +142,7 @@ public class ProjectDao {
 
 	}
 
-	public void addCar(String plate, int miles, int model, String type, int fee) throws  SQLException {
+	public void addCar(String plate, int miles, int model, String type, int fee) throws SQLException {
 		PreparedStatement addCar = null;
 		try {
 			con.setAutoCommit(false);
@@ -120,18 +155,17 @@ public class ProjectDao {
 			addCar.setInt(6, fee);
 
 			int added = addCar.executeUpdate();
-			if(added > 0) {
+			if (added > 0) {
 				System.out.println("Car added");
 			} else {
 				System.out.println("Car not added");
 			}
 
-
 		} catch (SQLException e) {
 			con.rollback();
 			printSQLException(e);
 		} finally {
-			if(addCar != null) {
+			if (addCar != null) {
 				addCar.close();
 			}
 			con.setAutoCommit(true);
@@ -150,7 +184,7 @@ public class ProjectDao {
 			addModel.setString(5, year);
 
 			int added = addModel.executeUpdate();
-			if(added > 0) {
+			if (added > 0) {
 				System.out.println("Model added");
 			} else {
 				System.out.println("Model not added");
@@ -159,7 +193,7 @@ public class ProjectDao {
 		} catch (SQLException e) {
 			con.rollback();
 		} finally {
-			if(addModel != null) {
+			if (addModel != null) {
 				addModel.close();
 			}
 			con.setAutoCommit(true);
@@ -167,54 +201,55 @@ public class ProjectDao {
 	}
 
 	public void getAvailableCars() throws SQLException {
-	    PreparedStatement getAvCars = null;
+		PreparedStatement getAvCars = null;
 
-	    try {
-	        con.setAutoCommit(false);
-            getAvCars = con.prepareStatement("SELECT * FROM car WHERE status='Available'");
+		try {
+			con.setAutoCommit(false);
+			getAvCars = con.prepareStatement("SELECT * FROM car WHERE status='Available'");
 
-            ResultSet resultSet = getAvCars.executeQuery();
+			ResultSet resultSet = getAvCars.executeQuery();
 
-            ResultSetMetaData rsmd = resultSet.getMetaData();
+			ResultSetMetaData rsmd = resultSet.getMetaData();
 
-            int columnsNumber = rsmd.getColumnCount();
-	    
-                for (int i = 1; i <= columnsNumber; i++) {
-                    System.out.print("|" + rsmd.getColumnName(i) + "|");
-                }
+			int columnsNumber = rsmd.getColumnCount();
 
-		System.out.println("");
-            while (resultSet.next()) {
+			for (int i = 1; i <= columnsNumber; i++) {
+				System.out.print("|" + rsmd.getColumnName(i) + "|");
+			}
 
-                for (int i = 1; i <= columnsNumber; i++) {
-                    String columnValue = resultSet.getString(i);
-                    System.out.print("| " + columnValue + " |");
-                }
-		System.out.println(" ");
-		System.out.println("-------------------------------------");
+			System.out.println("");
+			while (resultSet.next()) {
 
-            }
+				for (int i = 1; i <= columnsNumber; i++) {
+					String columnValue = resultSet.getString(i);
+					System.out.print("| " + columnValue + " |");
+				}
+				System.out.println(" ");
+				System.out.println("-------------------------------------");
 
-            resultSet.close();
-        } catch (SQLException e) {
-	        con.rollback();
-        } finally {
-	        if(getAvCars != null) {
-                getAvCars.close();
-            }
+			}
+
+			resultSet.close();
+		} catch (SQLException e) {
+			con.rollback();
+		} finally {
+			if (getAvCars != null) {
+				getAvCars.close();
+			}
 			con.setAutoCommit(true);
 
-        }
-    }
+		}
+	}
 
-    public void getRentalDetails(int rentalID) throws SQLException{
+	public void getRentalDetails(int rentalID) throws SQLException {
 		PreparedStatement getRentDet = null;
 
 		try {
 			con.setAutoCommit(false);
-			getRentDet = con.prepareStatement("select rent.plate, rent.start, rent.end, rent.num_miles, rent.fee_type, client.name, client.dl, client.phone" +
-				", car.*, datediff(rent.end, rent.start) * car.fee as total from rent " + 
-				"join client on rent.code = client.code join car on rent.plate = car.plate_number where rental_id = ?");
+			getRentDet = con.prepareStatement(
+					"select rent.plate, rent.start, rent.end, rent.num_miles, rent.fee_type, client.name, client.dl, client.phone"
+							+ ", car.*, datediff(rent.end, rent.start) * car.fee as total from rent "
+							+ "join client on rent.code = client.code join car on rent.plate = car.plate_number where rental_id = ?");
 			getRentDet.setInt(1, rentalID);
 
 			ResultSet resultSet = getRentDet.executeQuery();
@@ -230,7 +265,6 @@ public class ProjectDao {
 			System.out.println("");
 			while (resultSet.next()) {
 
-				
 				for (int i = 1; i <= columnsNumber; i++) {
 					String columnValue = resultSet.getString(i);
 					System.out.print("| " + columnValue + " |");
@@ -245,7 +279,7 @@ public class ProjectDao {
 			con.rollback();
 			printSQLException(e);
 		} finally {
-			if(getRentDet != null) {
+			if (getRentDet != null) {
 				getRentDet.close();
 			}
 			con.setAutoCommit(true);
@@ -269,7 +303,7 @@ public class ProjectDao {
 			}
 		}
 
-		//Connection
+		// Connection
 		try {
 			con.setAutoCommit(true);
 			con.close();
@@ -278,25 +312,24 @@ public class ProjectDao {
 		}
 	}
 
-	public static void main (String[] args) {
+	public static void main(String[] args) {
 		ProjectDao dao = new ProjectDao();
 		System.out.println("Dao started");
 		dao.shutDown();
-        	System.out.println("Dao shut down correctly");
+		System.out.println("Dao shut down correctly");
 	}
 
 	/**
-	 * Prints details of an SQLException chain to <code>System.err</code>.
-	 * Details included are SQL State, Error code, Exception message.
+	 * Prints details of an SQLException chain to <code>System.err</code>. Details
+	 * included are SQL State, Error code, Exception message.
 	 *
-	 * @param e the SQLException from which to print details.
+	 * @param e
+	 *            the SQLException from which to print details.
 	 */
-	public static void printSQLException(SQLException e)
-	{
+	public static void printSQLException(SQLException e) {
 		// Unwraps the entire exception chain to unveil the real cause of the
 		// Exception.
-		while (e != null)
-		{
+		while (e != null) {
 			System.err.println("\n----- SQLException -----");
 			System.err.println("  SQL State:  " + e.getSQLState());
 			System.err.println("  Error Code: " + e.getErrorCode());
@@ -305,4 +338,4 @@ public class ProjectDao {
 		}
 	}
 
-}	
+}
