@@ -2,17 +2,24 @@
 import java.io.*;
 import java.sql.*;
 import java.util.*;
-
+/**
+ * @author mross, hjohnson
+ *
+ */
 public class ProjectDao {
 	private static ArrayList<Statement> statements = new ArrayList<Statement>();
 	private static Connection con;
 	private static boolean made;
 
+	/**
+	 * 
+	 */
 	public ProjectDao() {
 		getConnection();
 	}
 
-	/*
+	
+	/**
 	 * Only call startUp if it's the first time the DAO is being called. Otherwise,
 	 * just return existing connection
 	 */
@@ -22,6 +29,9 @@ public class ProjectDao {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	public void startUp() {
 		try {
 			String strRemotHost = "localhost";
@@ -54,6 +64,10 @@ public class ProjectDao {
 		}
 	}
 
+	/**
+	 * prints list all the cars – list the car description and status
+	 * @throws SQLException
+	 */
 	public void getCars() throws SQLException {
 		PreparedStatement getCars = null;
 
@@ -90,6 +104,13 @@ public class ProjectDao {
 
 	}
 	
+	/**
+	 * add new client to database
+	 * @param name
+	 * @param licenseNumber
+	 * @param phoneNum
+	 * @throws SQLException
+	 */
 	public void addClient(String name, String licenseNumber, String phoneNum) throws SQLException{
 		PreparedStatement addClient = null;
 		try {
@@ -118,13 +139,19 @@ public class ProjectDao {
 			con.setAutoCommit(true);
 		}
 	}
-	public String getclientName(int client) throws SQLException{
+	/**
+	 * returns client name associated with given code
+	 * @param clientCode
+	 * @return client name 
+	 * @throws SQLException
+	 */
+	public String getclientName(int clientCode) throws SQLException{
 		PreparedStatement clientCheck = null;
 		String returnStmt = null;
 		try {
 			con.setAutoCommit(false);
 			clientCheck = con.prepareStatement("SELECT name FROM client WHERE code=?");
-			clientCheck.setInt(1, client); 
+			clientCheck.setInt(1, clientCode); 
 			ResultSet resultSet = clientCheck.executeQuery();
 			while (resultSet.next()) {
 				returnStmt = resultSet.getString("name");
@@ -146,13 +173,19 @@ public class ProjectDao {
 		}
 		return returnStmt;
 	}
-	public String getCarStatus(String car)throws SQLException{
+	/**
+	 * returns status of car associated 
+	 * @param plateNum
+	 * @return carStatus
+	 * @throws SQLException
+	 */
+	public String getCarStatus(String plateNum)throws SQLException{
 		PreparedStatement getCarStatus = null;
 		String returnStmt=null;
 		try {
 			con.setAutoCommit(false);
 			getCarStatus = con.prepareStatement("SELECT status FROM car WHERE plate_number=?");
-			getCarStatus.setString(1, car); 
+			getCarStatus.setString(1, plateNum); 
 			ResultSet resultSet = getCarStatus.executeQuery();
 			while (resultSet.next()) {
 				returnStmt = resultSet.getString("status");
@@ -173,9 +206,15 @@ public class ProjectDao {
 		}
 		return returnStmt; 
 	}
-	public void updateCarStatus(String status, String car) throws SQLException{
+	/**
+	 * updates status of car associated with the given plate number
+	 * @param status
+	 * @param plateNum
+	 * @throws SQLException
+	 */
+	public void updateCarStatus(String status, String plateNum) throws SQLException{
 		if(!status.equals("Available")) {
-			if(!getCarStatus(car).equals("Available")) {
+			if(!getCarStatus(plateNum).equals("Available")) {
 				System.err.println("Car is not available");
 				System.exit(0);
 			}
@@ -185,7 +224,7 @@ public class ProjectDao {
 			con.setAutoCommit(false);
 			updateStatus = con.prepareStatement("UPDATE car SET status=? WHERE plate_number=?");
 			updateStatus.setString(1, status);
-			updateStatus.setString(2, car);
+			updateStatus.setString(2, plateNum);
 			int added = updateStatus.executeUpdate();
 			if (added > 0) {
 				System.out.println("car status updated to: "+ status);
@@ -203,17 +242,27 @@ public class ProjectDao {
 		}
 		
 	}
-	public void rentCar(int client, String car, String startDate, String endDate, int miles, String feeType) throws SQLException {
-		String clientName = getclientName(client); //check client exist 
-		System.out.println(clientName);
-		updateCarStatus("Rented", car); //check car is available and update status to Rented
+	/**
+	 * rent car, add new entry to rent table
+	 * @param clientCode
+	 * @param plateNum
+	 * @param startDate
+	 * @param endDate
+	 * @param miles
+	 * @param feeType
+	 * @throws SQLException
+	 */
+	public void rentCar(int clientCode, String plateNum, String startDate, String endDate, int miles, String feeType) throws SQLException {
+		String clientName = getclientName(clientCode); //check client exist 
+		System.out.println(clientName); 
+		updateCarStatus("Rented", plateNum); //check car is available and update status to Rented
 		PreparedStatement rentCar = null;
 		try {
 			con.setAutoCommit(false);
 			rentCar = con.prepareStatement("insert into rent values (?, ?, ?, ?, ?, ?, ?)");
 			rentCar.setInt(1, 0);
-			rentCar.setString(2, car);
-			rentCar.setInt(3, client);
+			rentCar.setString(2, plateNum);
+			rentCar.setInt(3, clientCode);
 			rentCar.setString(4, startDate);
 			rentCar.setString(5, endDate);
 			rentCar.setInt(6, miles);
@@ -240,6 +289,10 @@ public class ProjectDao {
 		
 	}
 
+	/**
+	 * @return array list of models in database
+	 * @throws SQLException
+	 */
 	public ArrayList<String> getAllModels() throws SQLException {
 		PreparedStatement getAllModels = null;
 		ArrayList<String> modelOptions = new ArrayList<>();
@@ -264,6 +317,12 @@ public class ProjectDao {
 		return modelOptions;
 	}
 
+	/**
+	 * returns model number associated with the model name
+	 * @param name
+	 * @return model number
+	 * @throws SQLException
+	 */
 	public int getModelNum(String name) throws SQLException {
 		PreparedStatement getModel = null;
 		int modelNum = 1;
@@ -292,6 +351,15 @@ public class ProjectDao {
 
 	}
 
+	/**
+	 * add new car to database
+	 * @param plate
+	 * @param miles
+	 * @param model
+	 * @param type
+	 * @param fee
+	 * @throws SQLException
+	 */
 	public void addCar(String plate, int miles, int model, String type, int fee) throws SQLException {
 		PreparedStatement addCar = null;
 		try {
@@ -322,6 +390,14 @@ public class ProjectDao {
 		}
 	}
 
+	/**
+	 * add new model to database
+	 * @param name
+	 * @param make
+	 * @param engSize
+	 * @param year
+	 * @throws SQLException
+	 */
 	public void addModel(String name, String make, int engSize, String year) throws SQLException {
 		PreparedStatement addModel = null;
 		try {
@@ -350,6 +426,10 @@ public class ProjectDao {
 		}
 	}
 
+	/**
+	 * prints list of all the available cars – list the car description
+	 * @throws SQLException
+	 */
 	public void getAvailableCars() throws SQLException {
 		PreparedStatement getAvCars = null;
 
@@ -391,6 +471,11 @@ public class ProjectDao {
 		}
 	}
 
+	/**
+	 * returns rental details associated with rental ID
+	 * @param rentalID
+	 * @throws SQLException
+	 */
 	public void getRentalDetails(int rentalID) throws SQLException {
 		PreparedStatement getRentDet = null;
 
@@ -437,6 +522,9 @@ public class ProjectDao {
 
 	}
 
+	/**
+	 * 
+	 */
 	public static void shutDown() {
 		// Statements and PreparedStatements
 		int i = 0;
@@ -462,6 +550,9 @@ public class ProjectDao {
 		}
 	}
 
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		ProjectDao dao = new ProjectDao();
 		System.out.println("Dao started");
@@ -475,6 +566,9 @@ public class ProjectDao {
 	 *
 	 * @param e
 	 *            the SQLException from which to print details.
+	 */
+	/**
+	 * @param e
 	 */
 	public static void printSQLException(SQLException e) {
 		// Unwraps the entire exception chain to unveil the real cause of the

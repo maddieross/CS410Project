@@ -2,12 +2,15 @@ import java.sql.*;
 import java.util.ArrayList;
 
 /**
- * @author mross
+ * @author mross, hjohnson
  *
  */
 public class Project {
 	private static ProjectDao dao;
 
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		if (args.length > 0) {
 			dao = new ProjectDao();
@@ -91,6 +94,9 @@ public class Project {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	private static void cars() {
 		try {
 			System.out.println("Getting cars and status");
@@ -103,6 +109,9 @@ public class Project {
 
 	}
 
+	/**
+	 * 
+	 */
 	private static void availableCars() {
 		try {
 			System.out.println("Getting all available cars");
@@ -114,6 +123,11 @@ public class Project {
 		}
 	}
 
+	/**
+	 * @param model
+	 * @param plateNum
+	 * @param miles
+	 */
 	private static void addNewCar(String model, String plateNum, int miles) {
 		try {
 			System.out.println("Adding new car. Seeing if it's existing model");
@@ -156,6 +170,12 @@ public class Project {
 
 	}
 
+	/**
+	 * @param name
+	 * @param code
+	 * @param licenseNumber
+	 * @param phoneNum
+	 */
 	private static void addClient(String name, int code, String licenseNumber, String phoneNum) {
 		try {
 			System.out.println("Adding client: "+ name);
@@ -167,6 +187,14 @@ public class Project {
 		}
 	}
 
+	/**
+	 * @param client
+	 * @param car
+	 * @param startDate
+	 * @param endDate
+	 * @param miles
+	 * @param feeType
+	 */
 	private static void rentCar(int client, String car, String startDate, String endDate, int miles, String feeType) {
 		//TODO check date is entered in correct format? 
 		
@@ -186,6 +214,9 @@ public class Project {
 		
 	}
 
+	/**
+	 * @param rentalID
+	 */
 	private static void rentalDetails(int rentalID) {
 		try {
 			System.out.println("Getting rental details for: " + rentalID);
@@ -197,11 +228,17 @@ public class Project {
 		}
 	}
 
+	/**
+	 * @param rentalID
+	 */
 	private static void deleteRental(int rentalID) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/**
+	 * 
+	 */
 	private static void help() {
 		System.out.println("usage: java Program [commands] [args....] ");
 		System.out.println("commands:");
