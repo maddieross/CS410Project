@@ -1,5 +1,9 @@
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+
 
 /**
  * @author mross, hjohnson
@@ -193,11 +197,19 @@ public class Project {
 	 * @param startDate
 	 * @param endDate
 	 * @param miles
-	 * @param feeType
+	 * @param feeType 
 	 */
 	private static void rentCar(int client, String car, String startDate, String endDate, int miles, String feeType) {
+		LocalDate myLocalDate = null;
 		//TODO check date is entered in correct format? 
-		
+		try {
+			myLocalDate = LocalDate.parse(startDate);
+			myLocalDate = LocalDate.parse(endDate); 
+		}catch(Exception e) {
+			System.err.println("incorrect date format. Must be formated in yyyy-MM-dd");
+			System.exit(0);
+		}
+	
 		if(feeType.equals("Economy") || feeType.equals("Compact") || feeType.equals("Midsize") || feeType.equals("FullSize") || feeType.equals("Premium")|| feeType.equals("Luxury")) {
 			try {
 				System.out.println("Renting car to:");
@@ -220,7 +232,7 @@ public class Project {
 	private static void rentalDetails(int rentalID) {
 		try {
 			System.out.println("Getting rental details for: " + rentalID);
-			dao.getRentalDetails(rentalID);
+		 	dao.getRentalDetails(rentalID);
 		} catch (SQLException e) {
 			dao.printSQLException(e);
 		} finally {

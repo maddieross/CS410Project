@@ -65,7 +65,7 @@ public class ProjectDao {
 	}
 
 	/**
-	 * prints list all the cars – list the car description and status
+	 * prints list all the cars - list the car description and status
 	 * @throws SQLException
 	 */
 	public void getCars() throws SQLException {
@@ -427,7 +427,7 @@ public class ProjectDao {
 	}
 
 	/**
-	 * prints list of all the available cars – list the car description
+	 * prints list of all the available cars - list the car description
 	 * @throws SQLException
 	 */
 	public void getAvailableCars() throws SQLException {
