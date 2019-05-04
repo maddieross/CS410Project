@@ -492,14 +492,15 @@ public class ProjectDao {
 
 			ResultSetMetaData rsmd = resultSet.getMetaData();
 
-			int columnsNumber = rsmd.getColumnCount();
-
-			for (int i = 1; i <= columnsNumber; i++) {
-				System.out.print("|" + rsmd.getColumnName(i) + "|");
-			}
-
-			System.out.println("");
+			int count = 0;	
 			while (resultSet.next()) {
+
+				int columnsNumber = rsmd.getColumnCount();
+
+				for (int i = 1; i <= columnsNumber; i++) {
+					System.out.print("|" + rsmd.getColumnName(i) + "|");
+				}
+				System.out.println("");
 
 				for (int i = 1; i <= columnsNumber; i++) {
 					String columnValue = resultSet.getString(i);
@@ -507,8 +508,10 @@ public class ProjectDao {
 				}
 				System.out.println(" ");
 				System.out.println("-------------------------------------");
-
+				count++;
 			}
+
+			if(count == 0) { System.out.println(rentalID + " is not a valid rental entry");}
 
 			resultSet.close();
 		} catch (SQLException e) {
@@ -529,14 +532,17 @@ public class ProjectDao {
 		try {
 			con.setAutoCommit(false);
 			rental = con.prepareStatement("select plate from rent where rental_id = ?");
+			rental.setInt(1, rentId);
 			ResultSet rs = rental.executeQuery();
 
 
-			if(rs != null) {
-				String plateNum = "";
+			String plateNum = "";
+			while(rs.next()) {
+
 				plateNum = rs.getString("plate");
+			}
 
-
+			if(!plateNum.isEmpty()) {
 				deleteRental = con.prepareStatement("delete from rent where rental_id = ?");
 				deleteRental.setInt(1, rentId);
 
@@ -546,10 +552,11 @@ public class ProjectDao {
 				} else {
 					System.out.println("Rental entry deleted");
 				}
-			} else {
-				System.out.println(rentId + "is not a valid rental entry");
-			}
 
+				updateCarStatus("Available", plateNum);
+			} else {
+				System.out.println(rentId + " is not a valid rental entry");
+			}
 		} catch(SQLException e) {
 			con.rollback();
 			printSQLException(e);
