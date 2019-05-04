@@ -99,7 +99,7 @@ public class Project {
 	}
 
 	/**
-	 * 
+	 * Get all cars
 	 */
 	private static void cars() {
 		try {
@@ -114,7 +114,7 @@ public class Project {
 	}
 
 	/**
-	 * 
+	 * Get all available cars
 	 */
 	private static void availableCars() {
 		try {
@@ -128,6 +128,7 @@ public class Project {
 	}
 
 	/**
+	 * Add a new car. If it's a new model then add a new model and then a new car
 	 * @param model
 	 * @param plateNum
 	 * @param miles
@@ -244,7 +245,14 @@ public class Project {
 	 * @param rentalID
 	 */
 	private static void deleteRental(int rentalID) {
-		// TODO Auto-generated method stub
+		try {
+			System.out.println("Deleting rental: " + rentalID);
+			dao.deleteRental(rentalID);
+		} catch (SQLException e) {
+			dao.printSQLException(e);
+		} finally {
+			dao.shutDown();
+		}
 
 	}
 

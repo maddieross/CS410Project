@@ -12,7 +12,7 @@ public class ProjectDao {
 	private static boolean made;
 
 	/**
-	 * 
+	 * Everytime a constructor is called get the connection
 	 */
 	public ProjectDao() {
 		getConnection();
@@ -30,7 +30,7 @@ public class ProjectDao {
 	}
 
 	/**
-	 * 
+	 * Make first connection to the database, set class con variable to connection
 	 */
 	public void startUp() {
 		try {
@@ -50,6 +50,7 @@ public class ProjectDao {
 			stmt.close();
 			con.setAutoCommit(false);
 
+			//Tracks whether or not this is the first time start up has been called
 			made = true;
 
 		} catch (SQLException e) {
@@ -522,8 +523,32 @@ public class ProjectDao {
 
 	}
 
+	public void deleteRental(int rentId) throws SQLException {
+		PreparedStatement deleteRental = null;
+		try {
+			con.setAutoCommit(false);
+			deleteRental = con.prepareStatement("delete from rent where rental_id = ?");
+			deleteRental.setInt(1,rentId);
+
+			int result = deleteRental.executeUpdate();
+			if(result <= 0) {
+				System.out.println("Rental entry not deleted");
+			} else {
+				System.out.println("Rental entry deleted");
+			}
+
+		} catch(SQLException e) {
+			con.rollback();
+			printSQLException(e);
+		} finally {
+			if (deleteRental != null) {
+				deleteRental.close();
+			}
+			con.setAutoCommit(true);
+		}
+	}
 	/**
-	 * 
+	 * Properly shut down the database connection after every command
 	 */
 	public static void shutDown() {
 		// Statements and PreparedStatements
@@ -551,24 +576,11 @@ public class ProjectDao {
 	}
 
 	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		ProjectDao dao = new ProjectDao();
-		System.out.println("Dao started");
-		dao.shutDown();
-		System.out.println("Dao shut down correctly");
-	}
-
-	/**
 	 * Prints details of an SQLException chain to <code>System.err</code>. Details
 	 * included are SQL State, Error code, Exception message.
 	 *
 	 * @param e
 	 *            the SQLException from which to print details.
-	 */
-	/**
-	 * @param e
 	 */
 	public static void printSQLException(SQLException e) {
 		// Unwraps the entire exception chain to unveil the real cause of the
