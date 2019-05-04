@@ -525,16 +525,29 @@ public class ProjectDao {
 
 	public void deleteRental(int rentId) throws SQLException {
 		PreparedStatement deleteRental = null;
+		PreparedStatement rental = null;
 		try {
 			con.setAutoCommit(false);
-			deleteRental = con.prepareStatement("delete from rent where rental_id = ?");
-			deleteRental.setInt(1,rentId);
+			rental = con.prepareStatement("select plate from rent where rental_id = ?");
+			ResultSet rs = rental.executeQuery();
 
-			int result = deleteRental.executeUpdate();
-			if(result <= 0) {
-				System.out.println("Rental entry not deleted");
+
+			if(rs != null) {
+				String plateNum = "";
+				plateNum = rs.getString("plate");
+
+
+				deleteRental = con.prepareStatement("delete from rent where rental_id = ?");
+				deleteRental.setInt(1, rentId);
+
+				int result = deleteRental.executeUpdate();
+				if (result <= 0) {
+					System.out.println("Rental entry not deleted");
+				} else {
+					System.out.println("Rental entry deleted");
+				}
 			} else {
-				System.out.println("Rental entry deleted");
+				System.out.println(rentId + "is not a valid rental entry");
 			}
 
 		} catch(SQLException e) {
@@ -543,6 +556,10 @@ public class ProjectDao {
 		} finally {
 			if (deleteRental != null) {
 				deleteRental.close();
+			}
+
+			if(rental != null) {
+				rental.close();
 			}
 			con.setAutoCommit(true);
 		}
